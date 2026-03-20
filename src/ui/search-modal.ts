@@ -1,4 +1,4 @@
-import {App, Modal, Setting, Notice, debounce} from "obsidian";
+import {App, Modal, Setting, debounce} from "obsidian";
 import type {SearchResult} from "../models/types";
 import {Domain} from "../models/types";
 import {ProviderRegistry} from "../core/provider-registry";

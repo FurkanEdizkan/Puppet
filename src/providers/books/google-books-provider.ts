@@ -1,4 +1,4 @@
-import {ApiClient, PuppetApiError} from "../../services/api-client";
+import {ApiClient} from "../../services/api-client";
 import type {MetadataProvider, SearchResult, ContentMetadata, BookMetadata} from "../../models/types";
 import {Domain} from "../../models/types";
 

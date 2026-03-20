@@ -2,6 +2,8 @@ import {normalizePath} from "obsidian";
 import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, FinanceMetadata, GenericMetadata} from "../models/types";
 import {Domain} from "../models/types";
 
+type FieldValue = string | number | boolean | string[] | undefined | null;
+
 /**
  * Generates markdown note content from metadata,
  * including YAML frontmatter and a body section.
@@ -36,7 +38,7 @@ export class NoteGenerator {
 	private buildFrontmatter(metadata: ContentMetadata): string {
 		const lines: string[] = [];
 
-		const addField = (key: string, value: unknown) => {
+		const addField = (key: string, value: string | number | boolean | string[] | undefined | null) => {
 			if (value === undefined || value === null || value === "") return;
 			if (Array.isArray(value)) {
 				if (value.length === 0) return;
@@ -88,7 +90,7 @@ export class NoteGenerator {
 
 	private addMovieFields(
 		metadata: MovieMetadata,
-		addField: (key: string, value: unknown) => void,
+		addField: (key: string, value: FieldValue) => void,
 	): void {
 		addField("year", metadata.year);
 		addField("director", metadata.director);
@@ -111,7 +113,7 @@ export class NoteGenerator {
 
 	private addBookFields(
 		metadata: BookMetadata,
-		addField: (key: string, value: unknown) => void,
+		addField: (key: string, value: FieldValue) => void,
 	): void {
 		addField("author", metadata.author);
 		addField("authors", metadata.authors);
@@ -126,7 +128,7 @@ export class NoteGenerator {
 
 	private addAnimeFields(
 		metadata: AnimeMetadata,
-		addField: (key: string, value: unknown) => void,
+		addField: (key: string, value: FieldValue) => void,
 	): void {
 		addField("year", metadata.year);
 		addField("episodes", metadata.episodes);
@@ -140,7 +142,7 @@ export class NoteGenerator {
 
 	private addFinanceFields(
 		metadata: FinanceMetadata,
-		addField: (key: string, value: unknown) => void,
+		addField: (key: string, value: FieldValue) => void,
 	): void {
 		addField("symbol", metadata.symbol);
 		addField("assetType", metadata.assetType);
@@ -153,7 +155,7 @@ export class NoteGenerator {
 
 	private addGenericFields(
 		metadata: GenericMetadata,
-		addField: (key: string, value: unknown) => void,
+		addField: (key: string, value: FieldValue) => void,
 	): void {
 		addField("year", metadata.year);
 		addField("designer", metadata.designer);

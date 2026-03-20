@@ -31,8 +31,6 @@ export class DetailModal extends Modal {
 			const img = imgContainer.createEl("img");
 			img.src = posterUrl;
 			img.alt = meta.title;
-			img.style.maxWidth = "200px";
-			img.style.borderRadius = "6px";
 		}
 
 		// Info table

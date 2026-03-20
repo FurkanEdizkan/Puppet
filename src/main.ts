@@ -134,6 +134,7 @@ export default class Puppet extends Plugin {
 
 		this.addCommand({
 			id: "add-series",
+			// eslint-disable-next-line obsidianmd/ui/sentence-case
 			name: "Add TV series",
 			callback: () => this.openSearchFlow(Domain.Series),
 		});
@@ -182,7 +183,7 @@ export default class Puppet extends Plugin {
 				if (!file) return false;
 				if (!file.path.startsWith(this.settings.rootFolder + "/")) return false;
 				if (checking) return true;
-				this.refreshMetadata(file);
+				void this.refreshMetadata(file);
 				return true;
 			},
 		});
@@ -229,7 +230,7 @@ export default class Puppet extends Plugin {
 		}
 
 		new SearchModal(this.app, domain, this.registry, (result) => {
-			this.handleSearchSelection(domain, result);
+			void this.handleSearchSelection(domain, result);
 		}).open();
 	}
 
@@ -239,7 +240,7 @@ export default class Puppet extends Plugin {
 			const metadata = await this.registry.getDetails(domain, result.sourceId);
 
 			new DetailModal(this.app, metadata, () => {
-				this.createNote(metadata);
+				void this.createNote(metadata);
 			}).open();
 		} catch (err) {
 			new Notice(`Failed to fetch details: ${err instanceof Error ? err.message : String(err)}`);
@@ -312,6 +313,7 @@ export default class Puppet extends Plugin {
 		try {
 			const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
 			if (!frontmatter?.sourceId || !frontmatter?.source || !frontmatter?.type) {
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				new Notice("This note does not have Puppet metadata to refresh.");
 				return;
 			}

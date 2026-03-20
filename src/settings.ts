@@ -71,12 +71,12 @@ export class PuppetSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+	/* eslint-disable obsidianmd/ui/sentence-case */
 	display(): void {
 		const {containerEl} = this;
 		containerEl.empty();
 
 		// ── General ──────────────────────────────────────────────
-		containerEl.createEl("h2", {text: "General"});
 
 		new Setting(containerEl)
 			.setName("Root folder")
@@ -100,7 +100,7 @@ export class PuppetSettingTab extends PluginSettingTab {
 				}));
 
 		// ── Enabled domains ──────────────────────────────────────
-		containerEl.createEl("h2", {text: "Enabled domains"});
+		new Setting(containerEl).setName("Enabled domains").setHeading();
 
 		for (const domain of Object.values(Domain)) {
 			new Setting(containerEl)
@@ -114,10 +114,10 @@ export class PuppetSettingTab extends PluginSettingTab {
 		}
 
 		// ── Provider selection ───────────────────────────────────
-		containerEl.createEl("h2", {text: "Providers"});
+		new Setting(containerEl).setName("Providers").setHeading();
 
 		new Setting(containerEl)
-			.setName("Movie / Series provider")
+			.setName("Movie / series provider")
 			.setDesc("Choose which API to use for movie and TV series lookups.")
 			.addDropdown(dropdown => dropdown
 				.addOption("omdb", "OMDb")
@@ -141,7 +141,7 @@ export class PuppetSettingTab extends PluginSettingTab {
 				}));
 
 		// ── API keys ─────────────────────────────────────────────
-		containerEl.createEl("h2", {text: "API keys"});
+		new Setting(containerEl).setName("API keys").setHeading();
 
 		const apiKeyEntries: Array<{
 			key: keyof PuppetSettings["apiKeys"];
@@ -195,4 +195,5 @@ export class PuppetSettingTab extends PluginSettingTab {
 			});
 		}
 	}
+	/* eslint-enable obsidianmd/ui/sentence-case */
 }
