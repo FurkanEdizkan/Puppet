@@ -1,97 +1,359 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
-import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
+import {Notice, Plugin, TFile} from "obsidian";
+import {DEFAULT_SETTINGS, PuppetSettings, PuppetSettingTab} from "./settings";
+import {Domain} from "./models/types";
+import type {ContentMetadata, SearchResult} from "./models/types";
+import {FolderManager} from "./services/folder-manager";
+import {NoteGenerator} from "./services/note-generator";
+import {MediaHandler} from "./services/media-handler";
+import {ProviderRegistry} from "./core/provider-registry";
+import {BaseGenerator} from "./core/base-generator";
+import {ApiSetupGenerator} from "./core/api-setup-generator";
+import {OmdbProvider} from "./providers/movies/omdb-provider";
+import {GoogleBooksProvider} from "./providers/books/google-books-provider";
+import {OpenLibraryProvider} from "./providers/books/openlibrary-provider";
+import {JikanProvider} from "./providers/anime/jikan-provider";
+import {SteamProvider} from "./providers/games/steam-provider";
+import {BggProvider} from "./providers/boardgames/bgg-provider";
+import {SearchModal} from "./ui/search-modal";
+import {DetailModal} from "./ui/detail-modal";
 
 export default class Puppet extends Plugin {
-	settings: MyPluginSettings;
+	settings: PuppetSettings;
 
-	async onload() {
+	private folderManager: FolderManager;
+	private noteGenerator: NoteGenerator;
+	private mediaHandler: MediaHandler;
+	private registry: ProviderRegistry;
+	private baseGenerator: BaseGenerator;
+	private apiSetupGenerator: ApiSetupGenerator;
+
+	async onload(): Promise<void> {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+		// Initialize services
+		this.folderManager = new FolderManager(this.app, this.settings.rootFolder);
+		this.noteGenerator = new NoteGenerator();
+		this.mediaHandler = new MediaHandler(this.app, this.folderManager.getMediaPath());
+		this.registry = new ProviderRegistry();
+		this.baseGenerator = new BaseGenerator(this.app, this.settings.rootFolder);
+		this.apiSetupGenerator = new ApiSetupGenerator(this.app, this.settings.rootFolder);
+
+		// Register providers
+		this.registerProviders();
+
+		// Register commands
+		this.registerCommands();
+
+		// Settings tab
+		this.addSettingTab(new PuppetSettingTab(this.app, this));
+
+		// Defer folder creation until vault is fully loaded
+		this.app.workspace.onLayoutReady(async () => {
+			await this.folderManager.ensureFolders();
 		});
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample editor command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			}
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			new Notice("Click");
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-
 	}
 
-	onunload() {
+	onunload(): void {
+		// Cleanup handled by Obsidian's register* helpers
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MyPluginSettings>);
+	async loadSettings(): Promise<void> {
+		const loaded = await this.loadData() as Partial<PuppetSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
+		// Deep-merge nested objects that may be partially saved
+		this.settings.enabledDomains = Object.assign(
+			{}, DEFAULT_SETTINGS.enabledDomains, loaded?.enabledDomains
+		);
+		this.settings.apiKeys = Object.assign(
+			{}, DEFAULT_SETTINGS.apiKeys, loaded?.apiKeys
+		);
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
+		// Update services with new settings
+		this.folderManager.setRootFolder(this.settings.rootFolder);
+		this.mediaHandler.setMediaFolder(this.folderManager.getMediaPath());
+		this.baseGenerator.setRootFolder(this.settings.rootFolder);
+		this.apiSetupGenerator.setRootFolder(this.settings.rootFolder);
+		// Re-register providers (API keys may have changed)
+		this.registerProviders();
+		// Ensure folders exist after possible root change
+		await this.folderManager.ensureFolders();
 	}
 
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
+	// ── Provider Registration ────────────────────────────────────
+
+	private registerProviders(): void {
+		this.registry = new ProviderRegistry();
+
+		// Movies / Series — OMDb handles both
+		if (this.settings.apiKeys.omdb) {
+			this.registry.register(new OmdbProvider(this.settings.apiKeys.omdb, Domain.Movies));
+			this.registry.register(new OmdbProvider(this.settings.apiKeys.omdb, Domain.Series));
+		}
+		if (this.settings.movieProvider === "omdb") {
+			this.registry.setActive(Domain.Movies, "OMDb");
+			this.registry.setActive(Domain.Series, "OMDb");
+		}
+
+		// Books — Google Books or Open Library
+		if (this.settings.bookProvider === "google") {
+			this.registry.register(new GoogleBooksProvider(this.settings.apiKeys.googleBooks));
+			this.registry.setActive(Domain.Books, "Google Books");
+		} else {
+			this.registry.register(new OpenLibraryProvider());
+			this.registry.setActive(Domain.Books, "Open Library");
+		}
+
+		// Anime / Manga / Manhwa — Jikan (no API key required)
+		this.registry.register(new JikanProvider(Domain.Anime));
+		this.registry.setActive(Domain.Anime, "Jikan");
+		this.registry.register(new JikanProvider(Domain.Manga));
+		this.registry.setActive(Domain.Manga, "Jikan");
+		this.registry.register(new JikanProvider(Domain.Manhwa));
+		this.registry.setActive(Domain.Manhwa, "Jikan");
+
+		// Games — Steam (no API key required)
+		this.registry.register(new SteamProvider());
+		this.registry.setActive(Domain.Games, "Steam");
+
+		// Board games — BGG via api.geekdo.com (no API key required)
+		this.registry.register(new BggProvider());
+		this.registry.setActive(Domain.Boardgames, "BoardGameGeek");
+	}
+
+	// ── Commands ─────────────────────────────────────────────────
+
+	private registerCommands(): void {
+		this.addCommand({
+			id: "add-movie",
+			name: "Add movie",
+			callback: () => this.openSearchFlow(Domain.Movies),
+		});
+
+		this.addCommand({
+			id: "add-series",
+			name: "Add TV series",
+			callback: () => this.openSearchFlow(Domain.Series),
+		});
+
+		this.addCommand({
+			id: "add-book",
+			name: "Add book",
+			callback: () => this.openSearchFlow(Domain.Books),
+		});
+
+		this.addCommand({
+			id: "add-anime",
+			name: "Add anime",
+			callback: () => this.openSearchFlow(Domain.Anime),
+		});
+
+		this.addCommand({
+			id: "add-manga",
+			name: "Add manga",
+			callback: () => this.openSearchFlow(Domain.Manga),
+		});
+
+		this.addCommand({
+			id: "add-manhwa",
+			name: "Add manhwa",
+			callback: () => this.openSearchFlow(Domain.Manhwa),
+		});
+
+		this.addCommand({
+			id: "add-game",
+			name: "Add game",
+			callback: () => this.openSearchFlow(Domain.Games),
+		});
+
+		this.addCommand({
+			id: "add-boardgame",
+			name: "Add board game",
+			callback: () => this.openSearchFlow(Domain.Boardgames),
+		});
+
+		this.addCommand({
+			id: "refresh-metadata",
+			name: "Refresh current note metadata",
+			checkCallback: (checking) => {
+				const file = this.app.workspace.getActiveFile();
+				if (!file) return false;
+				if (!file.path.startsWith(this.settings.rootFolder + "/")) return false;
+				if (checking) return true;
+				this.refreshMetadata(file);
+				return true;
+			},
+		});
+
+		this.addCommand({
+			id: "generate-api-setup",
+			name: "Generate API setup guide",
+			callback: async () => {
+				try {
+					const path = await this.apiSetupGenerator.generate();
+					new Notice(`API setup guide created: ${path}`);
+				} catch (err) {
+					new Notice(`Failed to generate API setup guide: ${err instanceof Error ? err.message : String(err)}`);
+				}
+			},
+		});
+
+		this.addCommand({
+			id: "rebuild-folders",
+			name: "Rebuild folder structure",
+			callback: async () => {
+				try {
+					await this.folderManager.ensureFolders();
+					new Notice("Folder structure verified.");
+				} catch (err) {
+					new Notice(`Failed to rebuild folders: ${err instanceof Error ? err.message : String(err)}`);
+				}
+			},
+		});
+	}
+
+	// ── Search Flow ──────────────────────────────────────────────
+
+	private openSearchFlow(domain: Domain): void {
+		if (!this.settings.enabledDomains[domain]) {
+			new Notice(`Domain "${domain}" is disabled. Enable it in settings.`);
+			return;
+		}
+
+		const provider = this.registry.getActive(domain);
+		if (!provider) {
+			new Notice(`No provider configured for "${domain}". Add an API key in settings.`);
+			return;
+		}
+
+		new SearchModal(this.app, domain, this.registry, (result) => {
+			this.handleSearchSelection(domain, result);
+		}).open();
+	}
+
+	private async handleSearchSelection(domain: Domain, result: SearchResult): Promise<void> {
+		try {
+			new Notice(`Fetching details for "${result.title}"...`);
+			const metadata = await this.registry.getDetails(domain, result.sourceId);
+
+			new DetailModal(this.app, metadata, () => {
+				this.createNote(metadata);
+			}).open();
+		} catch (err) {
+			new Notice(`Failed to fetch details: ${err instanceof Error ? err.message : String(err)}`);
+		}
+	}
+
+	// ── Note Creation ────────────────────────────────────────────
+
+	private async createNote(metadata: ContentMetadata): Promise<void> {
+		try {
+			const domainPath = this.folderManager.getDomainPath(metadata.type);
+			const notePath = NoteGenerator.notePath(domainPath, metadata.title, metadata.year);
+
+			if (this.folderManager.fileExists(notePath)) {
+				new Notice(`Note already exists: ${notePath}`);
+				return;
+			}
+
+			// Download cover image if enabled and available
+			if (this.settings.autoDownloadImages) {
+				const posterUrl = this.extractPosterUrl(metadata);
+				if (posterUrl) {
+					const imgFilename = MediaHandler.coverFilename(
+						metadata.title,
+						metadata.year,
+						this.getExtensionFromUrl(posterUrl),
+					);
+					const savedPath = await this.mediaHandler.downloadImage(posterUrl, imgFilename);
+					if (savedPath) {
+						metadata.cover = savedPath;
+					}
+				}
+			}
+
+			// Generate note content
+			const content = this.noteGenerator.generate(metadata);
+			await this.app.vault.create(notePath, content);
+
+			// Ensure the relevant base file exists
+			await this.ensureBaseForDomain(metadata.type);
+
+			new Notice(`Created: ${notePath}`);
+
+			// Open the newly created note
+			const file = this.app.vault.getAbstractFileByPath(notePath);
+			if (file) {
+				await this.app.workspace.openLinkText(notePath, "", false);
+			}
+		} catch (err) {
+			new Notice(`Failed to create note: ${err instanceof Error ? err.message : String(err)}`);
+			console.error("Puppet: createNote error", err);
+		}
+	}
+
+	private async ensureBaseForDomain(domain: Domain): Promise<void> {
+		try {
+			if (domain === Domain.Movies) {
+				await this.baseGenerator.ensureMoviesBase();
+			} else if (domain === Domain.Series) {
+				await this.baseGenerator.ensureSeriesBase();
+			}
+		} catch (err) {
+			console.warn("Puppet: failed to ensure base file:", err);
+		}
+	}
+
+	// ── Refresh Metadata ─────────────────────────────────────────
+
+	private async refreshMetadata(file: TFile): Promise<void> {
+		try {
+			const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+			if (!frontmatter?.sourceId || !frontmatter?.source || !frontmatter?.type) {
+				new Notice("This note does not have Puppet metadata to refresh.");
+				return;
+			}
+
+			const domain = frontmatter.type as Domain;
+			const sourceId = frontmatter.sourceId as string;
+
+			new Notice(`Refreshing metadata for "${frontmatter.title ?? file.basename}"...`);
+			const metadata = await this.registry.getDetails(domain, sourceId);
+
+			// Preserve existing cover if we already downloaded one
+			if (frontmatter.cover) {
+				metadata.cover = frontmatter.cover as string;
+			}
+
+			const newContent = this.noteGenerator.generate(metadata);
+			await this.app.vault.modify(file, newContent);
+			new Notice("Metadata refreshed.");
+		} catch (err) {
+			new Notice(`Failed to refresh: ${err instanceof Error ? err.message : String(err)}`);
+		}
+	}
+
+	// ── Helpers ──────────────────────────────────────────────────
+
+	private extractPosterUrl(metadata: ContentMetadata): string | undefined {
+		if (metadata.type === Domain.Movies || metadata.type === Domain.Series) {
+			return metadata.poster ?? metadata.cover;
+		}
+		return metadata.cover;
+	}
+
+	private getExtensionFromUrl(url: string): string {
+		try {
+			const pathname = new URL(url).pathname;
+			const ext = pathname.split(".").pop()?.toLowerCase();
+			if (ext && ["jpg", "jpeg", "png", "webp", "gif"].includes(ext)) {
+				return ext;
+			}
+		} catch {
+			// Invalid URL
+		}
+		return "jpg";
 	}
 }
