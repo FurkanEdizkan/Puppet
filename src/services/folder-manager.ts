@@ -26,6 +26,11 @@ export class FolderManager {
 		return normalizePath(`${this.rootFolder}/media`);
 	}
 
+	/** Get the papers folder path (for research paper files). */
+	getPapersPath(): string {
+		return normalizePath(`${this.rootFolder}/${DOMAIN_FOLDERS[Domain.Research]}/papers`);
+	}
+
 	/** Get the subfolder path for a given domain. */
 	getDomainPath(domain: Domain): string {
 		return normalizePath(`${this.rootFolder}/${DOMAIN_FOLDERS[domain]}`);
@@ -42,6 +47,9 @@ export class FolderManager {
 		for (const domain of Object.values(Domain)) {
 			await this.ensureFolder(this.getDomainPath(domain));
 		}
+
+		// Research paper files subfolder
+		await this.ensureFolder(this.getPapersPath());
 	}
 
 	/** Create a single folder if it doesn't already exist. */

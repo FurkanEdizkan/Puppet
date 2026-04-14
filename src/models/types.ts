@@ -104,9 +104,26 @@ export interface FinanceMetadata extends BaseMetadata {
 	marketCap?: string;
 }
 
+/** Research paper metadata (arXiv). */
+export interface ResearchMetadata extends BaseMetadata {
+	type: Domain.Research;
+	authors?: string[];
+	primaryCategory?: string;
+	categories?: string[];
+	arxivId?: string;
+	doi?: string;
+	journalRef?: string;
+	comment?: string;
+	published?: string;
+	updated?: string;
+	pdfUrl?: string;
+	htmlUrl?: string;
+	paperFile?: string;
+}
+
 /** Metadata for domains without a dedicated interface. */
 export interface GenericMetadata extends BaseMetadata {
-	type: Domain.People | Domain.Research | Domain.Games | Domain.Boardgames;
+	type: Domain.People | Domain.Games | Domain.Boardgames;
 	designer?: string;
 	players?: string;
 	playingTime?: string;
@@ -118,6 +135,7 @@ export type ContentMetadata =
 	| BookMetadata
 	| AnimeMetadata
 	| FinanceMetadata
+	| ResearchMetadata
 	| GenericMetadata;
 
 /** A search result returned by a provider. */

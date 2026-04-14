@@ -1,7 +1,7 @@
 import {Notice, Plugin, TFile} from "obsidian";
 import {DEFAULT_SETTINGS, PuppetSettings, PuppetSettingTab} from "./settings";
 import {Domain} from "./models/types";
-import type {ContentMetadata, SearchResult} from "./models/types";
+import type {ContentMetadata, ResearchMetadata, SearchResult} from "./models/types";
 import {FolderManager} from "./services/folder-manager";
 import {NoteGenerator} from "./services/note-generator";
 import {MediaHandler} from "./services/media-handler";
@@ -14,6 +14,7 @@ import {OpenLibraryProvider} from "./providers/books/openlibrary-provider";
 import {JikanProvider} from "./providers/anime/jikan-provider";
 import {SteamProvider} from "./providers/games/steam-provider";
 import {BggProvider} from "./providers/boardgames/bgg-provider";
+import {ArxivProvider} from "./providers/research/arxiv-provider";
 import {SearchModal} from "./ui/search-modal";
 import {DetailModal} from "./ui/detail-modal";
 import {DomainSelectionModal} from "./ui/domain-selection-modal";
@@ -129,6 +130,10 @@ export default class Puppet extends Plugin {
 		// Board games — BGG via api.geekdo.com (no API key required)
 		this.registry.register(new BggProvider());
 		this.registry.setActive(Domain.Boardgames, "BoardGameGeek");
+
+		// Research papers — arXiv (no API key required)
+		this.registry.register(new ArxivProvider());
+		this.registry.setActive(Domain.Research, "arXiv");
 	}
 
 	// ── Commands ─────────────────────────────────────────────────
@@ -181,6 +186,12 @@ export default class Puppet extends Plugin {
 			id: "add-boardgame",
 			name: "Add board game",
 			callback: () => this.openSearchFlow(Domain.Boardgames),
+		});
+
+		this.addCommand({
+			id: "add-research",
+			name: "Add research paper",
+			callback: () => this.openSearchFlow(Domain.Research),
 		});
 
 		this.addCommand({
@@ -287,6 +298,14 @@ export default class Puppet extends Plugin {
 				}
 			}
 
+			// Download research paper file if applicable
+			if (metadata.type === Domain.Research) {
+				const paperPath = await this.downloadResearchPaper(metadata);
+				if (paperPath) {
+					metadata.paperFile = paperPath;
+				}
+			}
+
 			// Generate note content
 			const content = this.noteGenerator.generate(metadata);
 			await this.app.vault.create(notePath, content);
@@ -341,6 +360,23 @@ export default class Puppet extends Plugin {
 			return metadata.poster ?? metadata.cover;
 		}
 		return metadata.cover;
+	}
+
+	/** Download a research paper file (PDF or HTML) to the papers subfolder. */
+	private async downloadResearchPaper(metadata: ResearchMetadata): Promise<string | undefined> {
+		const ext = this.settings.paperFormat;
+		const url = ext === "html" ? metadata.htmlUrl : metadata.pdfUrl;
+		if (!url) return undefined;
+
+		const arxivId = metadata.arxivId ?? metadata.sourceId ?? "unknown";
+		const filename = `${arxivId.replace(/\//g, "_")}.${ext}`;
+		const papersFolder = this.folderManager.getPapersPath();
+
+		const savedPath = await this.mediaHandler.downloadPaper(url, filename, papersFolder);
+		if (!savedPath) {
+			new Notice(`Could not download paper file. The ${ext.toUpperCase()} format may not be available for this paper.`);
+		}
+		return savedPath;
 	}
 
 	private getExtensionFromUrl(url: string): string {

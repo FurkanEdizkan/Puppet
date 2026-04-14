@@ -1,5 +1,5 @@
 import {normalizePath} from "obsidian";
-import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, FinanceMetadata, GenericMetadata} from "../models/types";
+import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, FinanceMetadata, ResearchMetadata, GenericMetadata} from "../models/types";
 import {Domain} from "../models/types";
 
 type FieldValue = string | number | boolean | string[] | undefined | null;
@@ -70,10 +70,12 @@ export class NoteGenerator {
 			case Domain.Finance:
 				this.addFinanceFields(metadata, addField);
 				break;
-			case Domain.Games:
-			case Domain.Boardgames:
-			case Domain.People:
-			case Domain.Research:
+		case Domain.Research:
+			this.addResearchFields(metadata, addField);
+			break;
+		case Domain.Games:
+		case Domain.Boardgames:
+		case Domain.People:
 				this.addGenericFields(metadata, addField);
 				break;
 		}
@@ -151,6 +153,23 @@ export class NoteGenerator {
 		addField("changePercent", metadata.changePercent);
 		addField("currency", metadata.currency);
 		addField("marketCap", metadata.marketCap);
+	}
+
+	private addResearchFields(
+		metadata: ResearchMetadata,
+		addField: (key: string, value: FieldValue) => void,
+	): void {
+		addField("year", metadata.year);
+		addField("authors", metadata.authors);
+		addField("primaryCategory", metadata.primaryCategory);
+		addField("categories", metadata.categories);
+		addField("arxivId", metadata.arxivId);
+		addField("doi", metadata.doi);
+		addField("journalRef", metadata.journalRef);
+		addField("comment", metadata.comment);
+		addField("published", metadata.published);
+		addField("updated", metadata.updated);
+		addField("paperFile", metadata.paperFile);
 	}
 
 	private addGenericFields(

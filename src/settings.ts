@@ -13,6 +13,9 @@ export interface PuppetSettings {
 	movieProvider: "omdb" | "tmdb";
 	bookProvider: "google" | "openlibrary";
 
+	/** Preferred format for downloading research papers. */
+	paperFormat: "pdf" | "html";
+
 	/** API keys. */
 	apiKeys: {
 		omdb: string;
@@ -40,6 +43,7 @@ export const DEFAULT_SETTINGS: PuppetSettings = {
 	},
 	movieProvider: "omdb",
 	bookProvider: "google",
+	paperFormat: "pdf",
 	apiKeys: {
 		omdb: "",
 		tmdb: "",
@@ -137,6 +141,18 @@ export class PuppetSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.bookProvider)
 				.onChange(async (value) => {
 					this.plugin.settings.bookProvider = value as "google" | "openlibrary";
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName("Paper download format")
+			.setDesc("Preferred format for downloading research papers from arXiv.")
+			.addDropdown(dropdown => dropdown
+				.addOption("pdf", "PDF")
+				.addOption("html", "HTML (experimental)")
+				.setValue(this.plugin.settings.paperFormat)
+				.onChange(async (value) => {
+					this.plugin.settings.paperFormat = value as "pdf" | "html";
 					await this.plugin.saveSettings();
 				}));
 

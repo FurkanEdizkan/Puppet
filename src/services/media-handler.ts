@@ -61,6 +61,32 @@ export class MediaHandler {
 		return `${name}.${ext}`;
 	}
 
+	/**
+	 * Download a paper file (PDF or HTML) and save it to the given folder.
+	 * Returns the vault-relative path to the saved file, or undefined on failure.
+	 */
+	async downloadPaper(url: string, filename: string, papersFolder: string): Promise<string | undefined> {
+		const safeName = this.sanitizeFilename(filename);
+		const filePath = normalizePath(`${papersFolder}/${safeName}`);
+
+		if (this.app.vault.getAbstractFileByPath(filePath)) {
+			return filePath;
+		}
+
+		try {
+			const data = await this.apiClient.fetchBinary(url);
+			await this.app.vault.createBinary(filePath, data);
+			return filePath;
+		} catch (err) {
+			if (err instanceof PuppetNetworkError) {
+				console.warn(`Puppet: failed to download paper from ${url}: ${err.message}`);
+			} else {
+				console.error(`Puppet: unexpected error downloading paper:`, err);
+			}
+			return undefined;
+		}
+	}
+
 	private sanitizeFilename(name: string): string {
 		return name
 			.replace(/[\\/:*?"<>|#^[\]]/g, "")

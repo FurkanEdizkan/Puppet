@@ -1,5 +1,5 @@
 import {App, Modal, Setting} from "obsidian";
-import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata} from "../models/types";
+import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, ResearchMetadata} from "../models/types";
 import {Domain} from "../models/types";
 
 /**
@@ -44,6 +44,8 @@ export class DetailModal extends Modal {
 			this.addBookDetails(table, meta);
 		} else if (meta.type === Domain.Anime || meta.type === Domain.Manga || meta.type === Domain.Manhwa) {
 			this.addAnimeDetails(table, meta);
+		} else if (meta.type === Domain.Research) {
+			this.addResearchDetails(table, meta);
 		}
 
 		if (meta.tags && meta.tags.length > 0) {
@@ -104,6 +106,18 @@ export class DetailModal extends Modal {
 		if (meta.genres) this.addRow(table, "Genres", meta.genres.join(", "));
 		if (meta.studios) this.addRow(table, "Studios", meta.studios.join(", "));
 		if (meta.aired) this.addRow(table, "Aired", meta.aired);
+	}
+
+	private addResearchDetails(table: HTMLElement, meta: ResearchMetadata): void {
+		if (meta.authors && meta.authors.length > 0) this.addRow(table, "Authors", meta.authors.join(", "));
+		if (meta.primaryCategory) this.addRow(table, "Primary category", meta.primaryCategory);
+		if (meta.categories && meta.categories.length > 0) this.addRow(table, "Categories", meta.categories.join(", "));
+		if (meta.arxivId) this.addRow(table, "arXiv ID", meta.arxivId);
+		if (meta.doi) this.addRow(table, "DOI", meta.doi);
+		if (meta.journalRef) this.addRow(table, "Journal", meta.journalRef);
+		if (meta.comment) this.addRow(table, "Comment", meta.comment);
+		if (meta.published) this.addRow(table, "Published", meta.published);
+		if (meta.updated) this.addRow(table, "Updated", meta.updated);
 	}
 
 	private addRow(container: HTMLElement, label: string, value: string): void {

@@ -21,6 +21,7 @@ export class DomainSelectionModal extends Modal {
 		{domain: Domain.Manhwa, label: "Manhwa", emoji: "🎨"},
 		{domain: Domain.Games, label: "Games", emoji: "🎮"},
 		{domain: Domain.Boardgames, label: "Board Games", emoji: "🎲"},
+		{domain: Domain.Research, label: "Research", emoji: "📄"},
 	];
 
 	constructor(
