@@ -16,6 +16,7 @@ import {SteamProvider} from "./providers/games/steam-provider";
 import {BggProvider} from "./providers/boardgames/bgg-provider";
 import {SearchModal} from "./ui/search-modal";
 import {DetailModal} from "./ui/detail-modal";
+import {DomainSelectionModal} from "./ui/domain-selection-modal";
 
 export default class Puppet extends Plugin {
 	settings: PuppetSettings;
@@ -46,6 +47,13 @@ export default class Puppet extends Plugin {
 
 		// Settings tab
 		this.addSettingTab(new PuppetSettingTab(this.app, this));
+
+		// Ribbon icon for quick access to domain selection
+		this.addRibbonIcon("plus-circle", "Add content", () => {
+			new DomainSelectionModal(this.app, (domain) => {
+				this.openSearchFlow(domain);
+			}).open();
+		});
 
 		// Defer folder creation until vault is fully loaded
 		this.app.workspace.onLayoutReady(async () => {

@@ -1,5 +1,8 @@
 # Obsidian Sample Plugin
 
+https://console.cloud.google.com/apis/credentials?hl=tr&project=i-trees-322321
+https://docs.obsidian.md/Plugins/Getting+started/Development+workflow
+
 This is a sample plugin for Obsidian (https://obsidian.md).
 
 This project uses TypeScript to provide type checking and documentation.
@@ -50,6 +53,21 @@ Quick starting guide for new plugin devs:
 - Make sure your NodeJS is at least v16 (`node --version`).
 - `npm i` or `yarn` to install dependencies.
 - `npm run dev` to start compilation in watch mode.
+
+### Quick Access with Ribbon Icon
+
+The plugin adds a **"Add content"** icon to the Obsidian sidebar (left ribbon). Click it to open a modal where you can choose what type of content to add:
+
+- Movies
+- TV Series
+- Books
+- Anime
+- Manga
+- Manhwa
+- Games
+- Board Games
+
+Once you select a type, the search modal will open, allowing you to search for and add that content.
 
 ## Manually installing the plugin
 
