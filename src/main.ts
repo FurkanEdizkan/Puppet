@@ -260,6 +260,10 @@ export default class Puppet extends Plugin {
 	private async createNote(metadata: ContentMetadata): Promise<void> {
 		try {
 			const domainPath = this.folderManager.getDomainPath(metadata.type);
+
+			// Ensure folder still exists (user may have deleted it manually)
+			await this.folderManager.ensureFolders();
+
 			const notePath = NoteGenerator.notePath(domainPath, metadata.title, metadata.year);
 
 			if (this.folderManager.fileExists(notePath)) {
@@ -287,9 +291,6 @@ export default class Puppet extends Plugin {
 			const content = this.noteGenerator.generate(metadata);
 			await this.app.vault.create(notePath, content);
 
-			// Ensure the relevant base file exists
-			await this.ensureBaseForDomain(metadata.type);
-
 			new Notice(`Created: ${notePath}`);
 
 			// Open the newly created note
@@ -300,18 +301,6 @@ export default class Puppet extends Plugin {
 		} catch (err) {
 			new Notice(`Failed to create note: ${err instanceof Error ? err.message : String(err)}`);
 			console.error("Puppet: createNote error", err);
-		}
-	}
-
-	private async ensureBaseForDomain(domain: Domain): Promise<void> {
-		try {
-			if (domain === Domain.Movies) {
-				await this.baseGenerator.ensureMoviesBase();
-			} else if (domain === Domain.Series) {
-				await this.baseGenerator.ensureSeriesBase();
-			}
-		} catch (err) {
-			console.warn("Puppet: failed to ensure base file:", err);
 		}
 	}
 

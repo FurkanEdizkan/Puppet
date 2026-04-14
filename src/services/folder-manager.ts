@@ -45,7 +45,7 @@ export class FolderManager {
 	}
 
 	/** Create a single folder if it doesn't already exist. */
-	private async ensureFolder(path: string): Promise<void> {
+	async ensureFolder(path: string): Promise<void> {
 		const existing = this.app.vault.getAbstractFileByPath(path);
 		if (existing instanceof TFolder) {
 			return; // Already exists
