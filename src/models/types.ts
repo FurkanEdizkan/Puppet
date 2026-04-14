@@ -40,6 +40,7 @@ export interface BaseMetadata {
 	description?: string;
 	tags?: string[];
 	cover?: string;
+	coverLink?: string;
 	source?: string;
 	sourceId?: string;
 	dateAdded?: string;
@@ -119,6 +120,7 @@ export interface ResearchMetadata extends BaseMetadata {
 	pdfUrl?: string;
 	htmlUrl?: string;
 	paperFile?: string;
+	paperLink?: string;
 }
 
 /** Metadata for domains without a dedicated interface. */

@@ -66,8 +66,8 @@ export class SearchModal extends Modal {
 			this.renderResults();
 		} catch (err) {
 			this.resultsEl.empty();
-			const msg = err instanceof Error ? err.message : "Search failed";
-			this.resultsEl.createEl("p", {text: msg, cls: "puppet-search-error"});
+			const msg = err instanceof Error ? err.message : "Search failed. Please try again.";
+			this.resultsEl.createEl("p", {text: `Search failed: ${msg}`, cls: "puppet-search-error"});
 		}
 	}
 
@@ -125,6 +125,9 @@ export class SearchModal extends Modal {
 			case Domain.Books: return "Books";
 			case Domain.Games: return "Games";
 			case Domain.Boardgames: return "Board games";
+			case Domain.Research: return "Research";
+			case Domain.People: return "People";
+			case Domain.Finance: return "Finance";
 			default: return this.domain;
 		}
 	}

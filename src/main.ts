@@ -294,6 +294,8 @@ export default class Puppet extends Plugin {
 					const savedPath = await this.mediaHandler.downloadImage(posterUrl, imgFilename);
 					if (savedPath) {
 						metadata.cover = savedPath;
+						const vaultName = this.app.vault.getName();
+						metadata.coverLink = `obsidian://open?vault=${encodeURIComponent(vaultName)}&file=${encodeURIComponent(savedPath)}`;
 					}
 				}
 			}
@@ -303,6 +305,8 @@ export default class Puppet extends Plugin {
 				const paperPath = await this.downloadResearchPaper(metadata);
 				if (paperPath) {
 					metadata.paperFile = paperPath;
+					const vaultName = this.app.vault.getName();
+					metadata.paperLink = `obsidian://open?vault=${encodeURIComponent(vaultName)}&file=${encodeURIComponent(paperPath)}`;
 				}
 			}
 
@@ -340,9 +344,20 @@ export default class Puppet extends Plugin {
 			new Notice(`Refreshing metadata for "${frontmatter.title ?? file.basename}"...`);
 			const metadata = await this.registry.getDetails(domain, sourceId);
 
-			// Preserve existing cover if we already downloaded one
+			// Preserve existing cover and coverLink if we already downloaded one
 			if (frontmatter.cover) {
 				metadata.cover = frontmatter.cover as string;
+			}
+			if (frontmatter.coverLink) {
+				metadata.coverLink = frontmatter.coverLink as string;
+			}
+
+			// Preserve existing paper file and paperLink for research notes
+			if (frontmatter.paperFile) {
+				(metadata as ResearchMetadata).paperFile = frontmatter.paperFile as string;
+			}
+			if (frontmatter.paperLink) {
+				(metadata as ResearchMetadata).paperLink = frontmatter.paperLink as string;
 			}
 
 			const newContent = this.noteGenerator.generate(metadata);

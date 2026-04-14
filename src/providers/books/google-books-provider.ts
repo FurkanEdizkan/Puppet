@@ -1,4 +1,4 @@
-import {ApiClient} from "../../services/api-client";
+import {ApiClient, PuppetApiError} from "../../services/api-client";
 import type {MetadataProvider, SearchResult, ContentMetadata, BookMetadata} from "../../models/types";
 import {Domain} from "../../models/types";
 
@@ -68,6 +68,9 @@ export class GoogleBooksProvider implements MetadataProvider {
 		}
 
 		const item = await this.client.fetchJson<GoogleBooksVolume>(url);
+		if (!item || !item.volumeInfo) {
+			throw new PuppetApiError(`Book not found: ${sourceId}`, this.name);
+		}
 		const info = item.volumeInfo;
 
 		const isbn = this.extractIsbn(info.industryIdentifiers);

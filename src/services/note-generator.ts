@@ -82,6 +82,7 @@ export class NoteGenerator {
 
 		// Common trailing fields
 		addField("cover", metadata.cover);
+		addField("coverLink", metadata.coverLink);
 		addField("source", metadata.source);
 		addField("sourceId", metadata.sourceId);
 		addField("tags", metadata.tags);
@@ -170,6 +171,7 @@ export class NoteGenerator {
 		addField("published", metadata.published);
 		addField("updated", metadata.updated);
 		addField("paperFile", metadata.paperFile);
+		addField("paperLink", metadata.paperLink);
 	}
 
 	private addGenericFields(

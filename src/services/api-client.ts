@@ -41,15 +41,18 @@ export class ApiClient {
 			response = await requestUrl(params);
 		} catch (err) {
 			throw new PuppetNetworkError(
-				`Network error fetching ${url}: ${err instanceof Error ? err.message : String(err)}`
+				`Could not connect to the server. Check your internet connection.`
 			);
 		}
 		if (response.status < 200 || response.status >= 300) {
 			if (response.status === 429) {
 				throw new PuppetRateLimitError(1000);
 			}
+			if (response.status === 404) {
+				throw new PuppetNetworkError(`Not found (HTTP 404).`, response.status);
+			}
 			throw new PuppetNetworkError(
-				`HTTP ${response.status} from ${url}`,
+				`Request failed (HTTP ${response.status}). Try again later.`,
 				response.status
 			);
 		}
@@ -63,12 +66,15 @@ export class ApiClient {
 			response = await requestUrl({url});
 		} catch (err) {
 			throw new PuppetNetworkError(
-				`Network error fetching binary ${url}: ${err instanceof Error ? err.message : String(err)}`
+				`Could not download file. Check your internet connection.`
 			);
 		}
 		if (response.status < 200 || response.status >= 300) {
+			if (response.status === 404) {
+				throw new PuppetNetworkError(`File not found (HTTP 404).`, response.status);
+			}
 			throw new PuppetNetworkError(
-				`HTTP ${response.status} fetching binary from ${url}`,
+				`Download failed (HTTP ${response.status}). Try again later.`,
 				response.status
 			);
 		}
@@ -85,18 +91,22 @@ export class ApiClient {
 			const status = (err as Record<string, unknown>)?.status;
 			if (typeof status === "number") {
 				if (status === 429) throw new PuppetRateLimitError(1000);
-				throw new PuppetNetworkError(`HTTP ${status} from ${url}`, status);
+				if (status === 404) throw new PuppetNetworkError(`Not found (HTTP 404).`, status);
+				throw new PuppetNetworkError(`Request failed (HTTP ${status}). Try again later.`, status);
 			}
 			throw new PuppetNetworkError(
-				`Network error fetching ${url}: ${err instanceof Error ? err.message : String(err)}`
+				`Could not connect to the server. Check your internet connection.`
 			);
 		}
 		if (response.status < 200 || response.status >= 300) {
 			if (response.status === 429) {
 				throw new PuppetRateLimitError(1000);
 			}
+			if (response.status === 404) {
+				throw new PuppetNetworkError(`Not found (HTTP 404).`, response.status);
+			}
 			throw new PuppetNetworkError(
-				`HTTP ${response.status} from ${url}`,
+				`Request failed (HTTP ${response.status}). Try again later.`,
 				response.status
 			);
 		}
