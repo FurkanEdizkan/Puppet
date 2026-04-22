@@ -111,6 +111,21 @@ All API keys are configured in **Settings > Puppet > API keys** and stored local
 | Paper format | Preferred format for downloading research papers |
 | API keys | Configure keys for providers that require them |
 
+## Contributing
+
+Contributions are welcome! Please read the [commit convention](.github/COMMIT_CONVENTION.md) before submitting a PR.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes using [conventional commits](.github/COMMIT_CONVENTION.md)
+4. Ensure `npm run build`, `npm run test`, and `npm run lint` all pass
+5. Open a pull request
+
+## Contributors
+
+<!-- readme: contributors -start -->
+<!-- readme: contributors -end -->
+
 ## License
 
 [BSD](./LICENSE)

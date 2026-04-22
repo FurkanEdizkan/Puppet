@@ -1,0 +1,18 @@
+# <type>: <short summary>
+#
+# Types: feat, fix, refactor, chore, docs, test, style
+#
+# Rules:
+#   - Use lowercase for the summary
+#   - Do not end the summary with a period
+#   - Keep the summary under 72 characters
+#   - Use imperative mood ("add" not "added" or "adds")
+#
+# Examples:
+#   feat: add Steam provider for game search
+#   fix: handle empty API response in OMDb provider
+#   refactor: extract shared logic into base provider class
+#   chore: update esbuild to 0.25.x
+#   docs: add API key setup guide to README
+#   test: add coverage for note generator edge cases
+#
