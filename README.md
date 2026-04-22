@@ -1,108 +1,116 @@
-# Obsidian Sample Plugin
+# Puppet
 
-https://console.cloud.google.com/apis/credentials?hl=tr&project=i-trees-322321
-https://docs.obsidian.md/Plugins/Getting+started/Development+workflow
+Create and manage notes for movies, TV series, books, anime, games, research papers, and more with automatic metadata from various APIs.
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+## Features
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+- Search and create structured notes with rich metadata (YAML frontmatter)
+- Automatic cover image downloading
+- Research paper PDF downloading from arXiv
+- Organized folder structure per content type
+- Quick access ribbon icon for adding content
+- Configurable providers per domain
+- Per-domain enable/disable toggles
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+### Supported content types
 
-## First time developing plugins?
+| Domain | Provider | API key required |
+|---|---|---|
+| Movies & TV Series | [OMDb](https://www.omdbapi.com/) | Yes |
+| Books | [Google Books](https://developers.google.com/books) | Optional |
+| Books | [Open Library](https://openlibrary.org/) | No |
+| Anime, Manga, Manhwa | [Jikan](https://jikan.moe/) (MyAnimeList) | No |
+| Games | [Steam Store](https://store.steampowered.com/) | No |
+| Board Games | [BoardGameGeek](https://boardgamegeek.com/) | No |
+| Research Papers | [arXiv](https://arxiv.org/) | No |
 
-Quick starting guide for new plugin devs:
+## Installation
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### From community plugins (once published)
 
-## Releasing new releases
+1. Open **Settings > Community plugins**
+2. Select **Browse** and search for **Puppet**
+3. Select **Install**, then **Enable**
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+### Manual installation
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/FurkanEdizkan/Puppet/releases/latest)
+2. Create a folder called `puppet` inside your vault's `.obsidian/plugins/` directory
+3. Copy the downloaded files into that folder
+4. Restart Obsidian and enable the plugin in **Settings > Community plugins**
 
-## Adding your plugin to the community plugin list
+## API keys
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+Most providers work without an API key. For providers that require one, see the guides below.
 
-## How to use
+All API keys are configured in **Settings > Puppet > API keys** and stored locally in your vault's plugin data. Keys are only sent to their respective API endpoints.
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+### Movies & TV Series
 
-### Quick Access with Ribbon Icon
+- **[OMDb](https://www.omdbapi.com/)** — API key required
+  1. Go to [OMDb API](https://www.omdbapi.com/apikey.aspx)
+  2. Select the **Free** tier (1,000 requests/day) or a paid plan
+  3. Enter your email and submit
+  4. Check your email for the API key
+  5. Paste the key into **Settings > Puppet > OMDb API key**
 
-The plugin adds a **"Add content"** icon to the Obsidian sidebar (left ribbon). Click it to open a modal where you can choose what type of content to add:
+- **[TMDB](https://www.themoviedb.org/)** — optional alternative
+  1. Create an account at [TMDB](https://www.themoviedb.org/signup)
+  2. Go to **Settings > API** or visit [API Settings](https://www.themoviedb.org/settings/api)
+  3. Apply for an API key (select "Developer" usage)
+  4. Copy the **API Key (v3 auth)** value
+  5. Paste the key into **Settings > Puppet > TMDB API key**
 
-- Movies
-- TV Series
-- Books
-- Anime
-- Manga
-- Manhwa
-- Games
-- Board Games
+### Books
 
-Once you select a type, the search modal will open, allowing you to search for and add that content.
+- **[Google Books](https://developers.google.com/books)** — API key optional (works without one at reduced rate limits)
+  1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+  2. Create a new project (or select an existing one)
+  3. Navigate to **APIs & Services > Library**
+  4. Search for "Books API" and enable it
+  5. Go to **APIs & Services > Credentials**
+  6. Select **Create Credentials > API key**
+  7. Copy the key and paste it into **Settings > Puppet > Google Books API key**
 
-## Manually installing the plugin
+- **[Open Library](https://openlibrary.org/)** — no key needed
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+### Anime, Manga & Manhwa
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+- **[Jikan](https://docs.api.jikan.moe/)** (MyAnimeList) — no key needed. Rate limit: 3 requests per second.
 
-## Funding URL
+### Games
 
-You can include funding URLs where people who use your plugin can financially support it.
+- **[Steam Store](https://store.steampowered.com/)** — no key needed
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+### Board Games
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+- **[BoardGameGeek](https://boardgamegeek.com/)** — no key needed
 
-If you have multiple URLs, you can also do:
+### Research Papers
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+- **[arXiv](https://arxiv.org/)** — no key needed
 
-## API Documentation
+## Usage
 
-See https://docs.obsidian.md
+- Use the **ribbon icon** (sidebar) to pick a content type and search
+- Or use the **command palette** (`Ctrl/Cmd + P`) and search for commands like:
+  - `Puppet: Add movie`
+  - `Puppet: Add book`
+  - `Puppet: Add anime`
+  - `Puppet: Add research paper`
+  - etc.
+
+## Settings
+
+| Setting | Description |
+|---|---|
+| Root folder | Vault folder where Puppet stores all content (default: `Puppet`) |
+| Auto-download images | Automatically save cover art to your vault |
+| Enabled domains | Toggle which content types are available |
+| Movie/Book provider | Choose between available providers per domain |
+| Paper format | Preferred format for downloading research papers |
+| API keys | Configure keys for providers that require them |
+
+## License
+
+[BSD](./LICENSE)

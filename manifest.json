@@ -1,11 +1,10 @@
 {
-	"id": "Puppet",
+	"id": "puppet",
 	"name": "Puppet",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "My Puppet",
+	"description": "Create and manage notes for movies, TV series, books, anime, games, research papers, and more with automatic metadata from various APIs.",
 	"author": "FurkanEdizkan",
 	"authorUrl": "https://github.com/FurkanEdizkan",
-	"fundingUrl": "TODO",
 	"isDesktopOnly": false
 }

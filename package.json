@@ -1,9 +1,24 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "puppet",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Create and manage notes for movies, TV series, books, anime, games, research papers, and more with automatic metadata from various APIs.",
 	"main": "main.js",
 	"type": "module",
+	"author": "FurkanEdizkan",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/FurkanEdizkan/Puppet.git"
+	},
+	"keywords": [
+		"obsidian",
+		"obsidian-plugin",
+		"media",
+		"metadata",
+		"movies",
+		"books",
+		"anime",
+		"games"
+	],
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
@@ -13,7 +28,6 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage"
 	},
-	"keywords": [],
 	"license": "0-BSD",
 	"devDependencies": {
 		"@types/node": "^22.0.0",

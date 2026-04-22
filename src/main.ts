@@ -7,7 +7,6 @@ import {NoteGenerator} from "./services/note-generator";
 import {MediaHandler} from "./services/media-handler";
 import {ProviderRegistry} from "./core/provider-registry";
 import {BaseGenerator} from "./core/base-generator";
-import {ApiSetupGenerator} from "./core/api-setup-generator";
 import {OmdbProvider} from "./providers/movies/omdb-provider";
 import {GoogleBooksProvider} from "./providers/books/google-books-provider";
 import {OpenLibraryProvider} from "./providers/books/openlibrary-provider";
@@ -27,7 +26,6 @@ export default class Puppet extends Plugin {
 	private mediaHandler: MediaHandler;
 	private registry: ProviderRegistry;
 	private baseGenerator: BaseGenerator;
-	private apiSetupGenerator: ApiSetupGenerator;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -38,7 +36,6 @@ export default class Puppet extends Plugin {
 		this.mediaHandler = new MediaHandler(this.app, this.folderManager.getMediaPath());
 		this.registry = new ProviderRegistry();
 		this.baseGenerator = new BaseGenerator(this.app, this.settings.rootFolder);
-		this.apiSetupGenerator = new ApiSetupGenerator(this.app, this.settings.rootFolder);
 
 		// Register providers
 		this.registerProviders();
@@ -84,7 +81,6 @@ export default class Puppet extends Plugin {
 		this.folderManager.setRootFolder(this.settings.rootFolder);
 		this.mediaHandler.setMediaFolder(this.folderManager.getMediaPath());
 		this.baseGenerator.setRootFolder(this.settings.rootFolder);
-		this.apiSetupGenerator.setRootFolder(this.settings.rootFolder);
 		// Re-register providers (API keys may have changed)
 		this.registerProviders();
 		// Ensure folders exist after possible root change
@@ -204,19 +200,6 @@ export default class Puppet extends Plugin {
 				if (checking) return true;
 				void this.refreshMetadata(file);
 				return true;
-			},
-		});
-
-		this.addCommand({
-			id: "generate-api-setup",
-			name: "Generate API setup guide",
-			callback: async () => {
-				try {
-					const path = await this.apiSetupGenerator.generate();
-					new Notice(`API setup guide created: ${path}`);
-				} catch (err) {
-					new Notice(`Failed to generate API setup guide: ${err instanceof Error ? err.message : String(err)}`);
-				}
 			},
 		});
 
