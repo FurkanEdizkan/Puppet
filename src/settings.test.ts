@@ -20,13 +20,7 @@ describe("Settings", () => {
 
 		it("has empty API keys by default", () => {
 			expect(DEFAULT_SETTINGS.apiKeys.omdb).toBe("");
-			expect(DEFAULT_SETTINGS.apiKeys.tmdb).toBe("");
 			expect(DEFAULT_SETTINGS.apiKeys.googleBooks).toBe("");
-			expect(DEFAULT_SETTINGS.apiKeys.alphaVantage).toBe("");
-		});
-
-		it("defaults movie provider to omdb", () => {
-			expect(DEFAULT_SETTINGS.movieProvider).toBe("omdb");
 		});
 
 		it("defaults book provider to google", () => {

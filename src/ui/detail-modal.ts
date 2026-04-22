@@ -31,6 +31,7 @@ export class DetailModal extends Modal {
 			const img = imgContainer.createEl("img");
 			img.src = posterUrl;
 			img.alt = meta.title;
+			img.onerror = () => img.remove();
 		}
 
 		// Info table

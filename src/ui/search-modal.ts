@@ -126,8 +126,6 @@ export class SearchModal extends Modal {
 			case Domain.Games: return "Games";
 			case Domain.Boardgames: return "Board games";
 			case Domain.Research: return "Research";
-			case Domain.People: return "People";
-			case Domain.Finance: return "Finance";
 			default: return this.domain;
 		}
 	}
