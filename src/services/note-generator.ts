@@ -52,6 +52,7 @@ export class NoteGenerator {
 
 		addField("type", metadata.type);
 		addField("title", metadata.title);
+		addField("status", metadata.status);
 
 		// Domain-specific fields
 		switch (metadata.type) {
@@ -136,7 +137,7 @@ export class NoteGenerator {
 		addField("year", metadata.year);
 		addField("episodes", metadata.episodes);
 		addField("chapters", metadata.chapters);
-		addField("status", metadata.status);
+		addField("airingStatus", metadata.airingStatus);
 		addField("score", metadata.score);
 		addField("genres", metadata.genres);
 		addField("studios", metadata.studios);

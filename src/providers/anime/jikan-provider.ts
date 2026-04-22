@@ -95,7 +95,7 @@ export class JikanProvider implements MetadataProvider {
 			synopsis: item.synopsis,
 			episodes: item.episodes,
 			chapters: item.chapters,
-			status: item.status,
+			airingStatus: item.status,
 			score: item.score,
 			genres: allGenres.length > 0 ? allGenres : undefined,
 			studios: item.studios?.map(s => s.name),

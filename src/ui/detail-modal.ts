@@ -1,6 +1,6 @@
 import {App, Modal, Setting} from "obsidian";
 import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, ResearchMetadata} from "../models/types";
-import {Domain} from "../models/types";
+import {Domain, getStatusOptions} from "../models/types";
 
 /**
  * Modal that displays full details of a content item and lets
@@ -60,6 +60,22 @@ export class DetailModal extends Modal {
 			descEl.textContent = desc.length > 500 ? desc.substring(0, 500) + "..." : desc;
 		}
 
+		// Status selector
+		const statusOptions = getStatusOptions(meta.type);
+		const defaultStatus = statusOptions[0] ?? "Unwatched";
+		meta.status = defaultStatus;
+		new Setting(contentEl)
+			.setName("Status")
+			.addDropdown(dropdown => {
+				for (const option of statusOptions) {
+					dropdown.addOption(option, option);
+				}
+				dropdown.setValue(defaultStatus);
+				dropdown.onChange(value => {
+					meta.status = value;
+				});
+			});
+
 		// Confirm / Cancel
 		new Setting(contentEl)
 			.addButton(btn => btn
@@ -101,7 +117,7 @@ export class DetailModal extends Modal {
 	private addAnimeDetails(table: HTMLElement, meta: AnimeMetadata): void {
 		if (meta.episodes) this.addRow(table, "Episodes", String(meta.episodes));
 		if (meta.chapters) this.addRow(table, "Chapters", String(meta.chapters));
-		if (meta.status) this.addRow(table, "Status", meta.status);
+		if (meta.airingStatus) this.addRow(table, "Airing status", meta.airingStatus);
 		if (meta.score) this.addRow(table, "Score", String(meta.score));
 		if (meta.genres) this.addRow(table, "Genres", meta.genres.join(", "));
 		if (meta.studios) this.addRow(table, "Studios", meta.studios.join(", "));

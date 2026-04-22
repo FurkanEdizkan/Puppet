@@ -38,12 +38,38 @@ export interface BaseMetadata {
 	title: string;
 	year?: number;
 	description?: string;
+	status?: string;
 	tags?: string[];
 	cover?: string;
 	coverLink?: string;
 	source?: string;
 	sourceId?: string;
 	dateAdded?: string;
+}
+
+/** Status options grouped by domain category. */
+const WATCH_STATUS = ["Unwatched", "Watching", "Watched"] as const;
+const READ_STATUS = ["Unread", "Reading", "Read"] as const;
+const PLAY_STATUS = ["Unplayed", "Playing", "Played"] as const;
+
+/** Get the appropriate status options for a domain. */
+export function getStatusOptions(domain: Domain): readonly string[] {
+	switch (domain) {
+		case Domain.Movies:
+		case Domain.Series:
+		case Domain.Anime:
+			return WATCH_STATUS;
+		case Domain.Books:
+		case Domain.Manga:
+		case Domain.Manhwa:
+		case Domain.Research:
+			return READ_STATUS;
+		case Domain.Games:
+		case Domain.Boardgames:
+			return PLAY_STATUS;
+		default:
+			return WATCH_STATUS;
+	}
 }
 
 /** Movie / Series metadata. */
@@ -85,7 +111,7 @@ export interface AnimeMetadata extends BaseMetadata {
 	type: Domain.Anime | Domain.Manga | Domain.Manhwa;
 	episodes?: number;
 	chapters?: number;
-	status?: string;
+	airingStatus?: string;
 	score?: number;
 	genres?: string[];
 	studios?: string[];
