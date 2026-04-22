@@ -28,7 +28,6 @@ export class ProviderRegistry {
 	setActive(domain: Domain, providerName: string): void {
 		const list = this.providers.get(domain);
 		if (!list?.some(p => p.name === providerName)) {
-			console.warn(`Puppet: provider "${providerName}" not found for domain "${domain}".`);
 			return;
 		}
 		this.activeProvider.set(domain, providerName);

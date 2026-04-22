@@ -59,8 +59,6 @@ export class FolderManager {
 			return; // Already exists
 		}
 		if (existing) {
-			// A file exists at this path — don't overwrite
-			console.warn(`Puppet: path "${path}" exists but is not a folder.`);
 			return;
 		}
 		await this.app.vault.createFolder(path);
