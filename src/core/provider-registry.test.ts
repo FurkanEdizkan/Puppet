@@ -83,7 +83,7 @@ describe("ProviderRegistry", () => {
 	describe("getProviders", () => {
 		it("returns empty array for unregistered domain", () => {
 			const registry = new ProviderRegistry();
-			expect(registry.getProviders(Domain.Finance)).toEqual([]);
+			expect(registry.getProviders(Domain.Research)).toEqual([]);
 		});
 	});
 
@@ -100,8 +100,8 @@ describe("ProviderRegistry", () => {
 
 		it("throws if no provider registered for domain", async () => {
 			const registry = new ProviderRegistry();
-			await expect(registry.search(Domain.Finance, "test"))
-				.rejects.toThrow('No provider registered for domain "finance".');
+			await expect(registry.search(Domain.Research, "test"))
+				.rejects.toThrow('No provider registered for domain "research".');
 		});
 	});
 
@@ -117,8 +117,8 @@ describe("ProviderRegistry", () => {
 
 		it("throws if no provider registered for domain", async () => {
 			const registry = new ProviderRegistry();
-			await expect(registry.getDetails(Domain.Finance, "id"))
-				.rejects.toThrow('No provider registered for domain "finance".');
+			await expect(registry.getDetails(Domain.Research, "id"))
+				.rejects.toThrow('No provider registered for domain "research".');
 		});
 	});
 });

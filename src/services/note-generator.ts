@@ -1,5 +1,5 @@
 import {normalizePath} from "obsidian";
-import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, FinanceMetadata, ResearchMetadata, GenericMetadata} from "../models/types";
+import type {ContentMetadata, MovieMetadata, BookMetadata, AnimeMetadata, ResearchMetadata, GenericMetadata} from "../models/types";
 import {Domain} from "../models/types";
 
 type FieldValue = string | number | boolean | string[] | undefined | null;
@@ -68,15 +68,11 @@ export class NoteGenerator {
 			case Domain.Manhwa:
 				this.addAnimeFields(metadata, addField);
 				break;
-			case Domain.Finance:
-				this.addFinanceFields(metadata, addField);
+			case Domain.Research:
+				this.addResearchFields(metadata, addField);
 				break;
-		case Domain.Research:
-			this.addResearchFields(metadata, addField);
-			break;
-		case Domain.Games:
-		case Domain.Boardgames:
-		case Domain.People:
+			case Domain.Games:
+			case Domain.Boardgames:
 				this.addGenericFields(metadata, addField);
 				break;
 		}
@@ -142,19 +138,6 @@ export class NoteGenerator {
 		addField("genres", metadata.genres);
 		addField("studios", metadata.studios);
 		addField("aired", metadata.aired);
-	}
-
-	private addFinanceFields(
-		metadata: FinanceMetadata,
-		addField: (key: string, value: FieldValue) => void,
-	): void {
-		addField("symbol", metadata.symbol);
-		addField("assetType", metadata.assetType);
-		addField("price", metadata.price);
-		addField("change", metadata.change);
-		addField("changePercent", metadata.changePercent);
-		addField("currency", metadata.currency);
-		addField("marketCap", metadata.marketCap);
 	}
 
 	private addResearchFields(

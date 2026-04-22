@@ -1,5 +1,5 @@
 import {App, normalizePath} from "obsidian";
-import {ApiClient, PuppetNetworkError} from "./api-client";
+import {ApiClient} from "./api-client";
 
 /**
  * Downloads and manages media assets (cover images, posters).
@@ -38,12 +38,7 @@ export class MediaHandler {
 			const data = await this.apiClient.fetchBinary(url);
 			await this.app.vault.createBinary(filePath, data);
 			return filePath;
-		} catch (err) {
-			if (err instanceof PuppetNetworkError) {
-				console.warn(`Puppet: failed to download image from ${url}: ${err.message}`);
-			} else {
-				console.error(`Puppet: unexpected error downloading image:`, err);
-			}
+		} catch {
 			return undefined;
 		}
 	}
@@ -77,12 +72,7 @@ export class MediaHandler {
 			const data = await this.apiClient.fetchBinary(url);
 			await this.app.vault.createBinary(filePath, data);
 			return filePath;
-		} catch (err) {
-			if (err instanceof PuppetNetworkError) {
-				console.warn(`Puppet: failed to download paper from ${url}: ${err.message}`);
-			} else {
-				console.error(`Puppet: unexpected error downloading paper:`, err);
-			}
+		} catch {
 			return undefined;
 		}
 	}

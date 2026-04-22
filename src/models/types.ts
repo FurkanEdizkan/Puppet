@@ -10,11 +10,9 @@ export enum Domain {
 	Manga = "manga",
 	Manhwa = "manhwa",
 	Books = "books",
-	People = "people",
 	Research = "research",
 	Games = "games",
 	Boardgames = "boardgames",
-	Finance = "finance",
 }
 
 /** Maps each domain to its subfolder name inside the root managed folder. */
@@ -25,11 +23,9 @@ export const DOMAIN_FOLDERS: Record<Domain, string> = {
 	[Domain.Manga]: "manga",
 	[Domain.Manhwa]: "manhwa",
 	[Domain.Books]: "books",
-	[Domain.People]: "people",
 	[Domain.Research]: "research",
 	[Domain.Games]: "games",
 	[Domain.Boardgames]: "boardgames",
-	[Domain.Finance]: "finance",
 };
 
 /** Metadata fields common to all content items. */
@@ -119,18 +115,6 @@ export interface AnimeMetadata extends BaseMetadata {
 	synopsis?: string;
 }
 
-/** Finance metadata. */
-export interface FinanceMetadata extends BaseMetadata {
-	type: Domain.Finance;
-	symbol: string;
-	assetType: "stock" | "crypto" | "fund";
-	price?: number;
-	change?: number;
-	changePercent?: string;
-	currency?: string;
-	marketCap?: string;
-}
-
 /** Research paper metadata (arXiv). */
 export interface ResearchMetadata extends BaseMetadata {
 	type: Domain.Research;
@@ -151,7 +135,7 @@ export interface ResearchMetadata extends BaseMetadata {
 
 /** Metadata for domains without a dedicated interface. */
 export interface GenericMetadata extends BaseMetadata {
-	type: Domain.People | Domain.Games | Domain.Boardgames;
+	type: Domain.Games | Domain.Boardgames;
 	designer?: string;
 	players?: string;
 	playingTime?: string;
@@ -162,7 +146,6 @@ export type ContentMetadata =
 	| MovieMetadata
 	| BookMetadata
 	| AnimeMetadata
-	| FinanceMetadata
 	| ResearchMetadata
 	| GenericMetadata;
 

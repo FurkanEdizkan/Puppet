@@ -10,7 +10,6 @@ export interface PuppetSettings {
 	enabledDomains: Record<Domain, boolean>;
 
 	/** Provider selection per domain (when multiple providers exist). */
-	movieProvider: "omdb" | "tmdb";
 	bookProvider: "google" | "openlibrary";
 
 	/** Preferred format for downloading research papers. */
@@ -19,9 +18,7 @@ export interface PuppetSettings {
 	/** API keys. */
 	apiKeys: {
 		omdb: string;
-		tmdb: string;
 		googleBooks: string;
-		alphaVantage: string;
 	};
 }
 
@@ -35,20 +32,15 @@ export const DEFAULT_SETTINGS: PuppetSettings = {
 		[Domain.Manga]: true,
 		[Domain.Manhwa]: true,
 		[Domain.Books]: true,
-		[Domain.People]: true,
 		[Domain.Research]: true,
 		[Domain.Games]: true,
 		[Domain.Boardgames]: true,
-		[Domain.Finance]: true,
 	},
-	movieProvider: "omdb",
 	bookProvider: "google",
 	paperFormat: "pdf",
 	apiKeys: {
 		omdb: "",
-		tmdb: "",
 		googleBooks: "",
-		alphaVantage: "",
 	},
 };
 
@@ -60,11 +52,9 @@ const DOMAIN_LABELS: Record<Domain, string> = {
 	[Domain.Manga]: "Manga",
 	[Domain.Manhwa]: "Manhwa",
 	[Domain.Books]: "Books",
-	[Domain.People]: "People",
 	[Domain.Research]: "Research",
 	[Domain.Games]: "Games",
 	[Domain.Boardgames]: "Board games",
-	[Domain.Finance]: "Finance",
 };
 
 export class PuppetSettingTab extends PluginSettingTab {
@@ -121,18 +111,6 @@ export class PuppetSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName("Providers").setHeading();
 
 		new Setting(containerEl)
-			.setName("Movie / series provider")
-			.setDesc("Choose which API to use for movie and TV series lookups.")
-			.addDropdown(dropdown => dropdown
-				.addOption("omdb", "OMDb")
-				.addOption("tmdb", "TMDB")
-				.setValue(this.plugin.settings.movieProvider)
-				.onChange(async (value) => {
-					this.plugin.settings.movieProvider = value as "omdb" | "tmdb";
-					await this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
 			.setName("Book provider")
 			.setDesc("Choose which API to use for book lookups.")
 			.addDropdown(dropdown => dropdown
@@ -172,22 +150,10 @@ export class PuppetSettingTab extends PluginSettingTab {
 				url: "https://www.omdbapi.com/apikey.aspx",
 			},
 			{
-				key: "tmdb",
-				name: "TMDB API key",
-				desc: "Required for movie/series search via TMDB.",
-				url: "https://www.themoviedb.org/settings/api",
-			},
-			{
 				key: "googleBooks",
 				name: "Google Books API key",
 				desc: "Optional for Google Books (works without key at lower rate limits).",
 				url: "https://console.cloud.google.com/apis/library/books.googleapis.com",
-			},
-			{
-				key: "alphaVantage",
-				name: "Alpha Vantage API key",
-				desc: "Required for stock / finance data.",
-				url: "https://www.alphavantage.co/support/#api-key",
 			},
 		];
 

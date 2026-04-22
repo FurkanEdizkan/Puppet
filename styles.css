@@ -95,7 +95,7 @@
 .puppet-detail-poster img {
 	max-width: 200px;
 	border-radius: 6px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 2px 8px var(--shadow-color, rgba(0, 0, 0, 0.15));
 }
 
 .puppet-detail-info {
@@ -163,7 +163,7 @@
 .puppet-domain-button:hover {
 	background-color: var(--background-modifier-hover);
 	border-color: var(--text-accent);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 2px 8px var(--shadow-color, rgba(0, 0, 0, 0.1));
 }
 
 .puppet-domain-button:active {

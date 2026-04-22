@@ -92,12 +92,10 @@ export default class Puppet extends Plugin {
 	private registerProviders(): void {
 		this.registry = new ProviderRegistry();
 
-		// Movies / Series — OMDb handles both
+		// Movies / Series — OMDb
 		if (this.settings.apiKeys.omdb) {
 			this.registry.register(new OmdbProvider(this.settings.apiKeys.omdb, Domain.Movies));
 			this.registry.register(new OmdbProvider(this.settings.apiKeys.omdb, Domain.Series));
-		}
-		if (this.settings.movieProvider === "omdb") {
 			this.registry.setActive(Domain.Movies, "OMDb");
 			this.registry.setActive(Domain.Series, "OMDb");
 		}
@@ -306,7 +304,6 @@ export default class Puppet extends Plugin {
 			}
 		} catch (err) {
 			new Notice(`Failed to create note: ${err instanceof Error ? err.message : String(err)}`);
-			console.error("Puppet: createNote error", err);
 		}
 	}
 
@@ -343,8 +340,13 @@ export default class Puppet extends Plugin {
 				(metadata as ResearchMetadata).paperLink = frontmatter.paperLink as string;
 			}
 
+			// Preserve existing status
+			if (frontmatter.status) {
+				metadata.status = frontmatter.status as string;
+			}
+
 			const newContent = this.noteGenerator.generate(metadata);
-			await this.app.vault.modify(file, newContent);
+			await this.app.vault.process(file, () => newContent);
 			new Notice("Metadata refreshed.");
 		} catch (err) {
 			new Notice(`Failed to refresh: ${err instanceof Error ? err.message : String(err)}`);

@@ -54,13 +54,6 @@ All API keys are configured in **Settings > Puppet > API keys** and stored local
   4. Check your email for the API key
   5. Paste the key into **Settings > Puppet > OMDb API key**
 
-- **[TMDB](https://www.themoviedb.org/)** — optional alternative
-  1. Create an account at [TMDB](https://www.themoviedb.org/signup)
-  2. Go to **Settings > API** or visit [API Settings](https://www.themoviedb.org/settings/api)
-  3. Apply for an API key (select "Developer" usage)
-  4. Copy the **API Key (v3 auth)** value
-  5. Paste the key into **Settings > Puppet > TMDB API key**
-
 ### Books
 
 - **[Google Books](https://developers.google.com/books)** — API key optional (works without one at reduced rate limits)
