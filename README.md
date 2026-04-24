@@ -117,6 +117,16 @@ Contributions are welcome! Please read the [commit convention](.github/COMMIT_CO
 ## Contributors
 
 <!-- readme: contributors -start -->
+<table>
+<tr>
+    <td align="center">
+        <a href="https://github.com/FurkanEdizkan">
+            <img src="https://avatars.githubusercontent.com/u/65301915?v=4" width="80;" alt="FurkanEdizkan"/>
+            <br />
+            <sub><b>Furkan Edizkan</b></sub>
+        </a>
+    </td></tr>
+</table>
 <!-- readme: contributors -end -->
 
 ## License
