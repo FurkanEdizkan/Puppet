@@ -39,7 +39,7 @@ export class ApiClient {
 		let response: RequestUrlResponse;
 		try {
 			response = await requestUrl(params);
-		} catch (err) {
+		} catch {
 			throw new PuppetNetworkError(
 				`Could not connect to the server. Check your internet connection.`
 			);
@@ -64,7 +64,7 @@ export class ApiClient {
 		let response: RequestUrlResponse;
 		try {
 			response = await requestUrl({url});
-		} catch (err) {
+		} catch {
 			throw new PuppetNetworkError(
 				`Could not download file. Check your internet connection.`
 			);

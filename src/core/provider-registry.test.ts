@@ -7,10 +7,10 @@ function createMockProvider(name: string, domain: Domain): MetadataProvider {
 	return {
 		name,
 		domain,
-		search: vi.fn(async (): Promise<SearchResult[]> => [
+		search: vi.fn((): Promise<SearchResult[]> => Promise.resolve([
 			{title: "Mock Result", sourceId: "mock-1", source: name},
-		]),
-		getDetails: vi.fn(async (): Promise<ContentMetadata> => ({
+		])),
+		getDetails: vi.fn((): Promise<ContentMetadata> => Promise.resolve({
 			type: domain as Domain.Games,
 			title: "Mock Detail",
 			source: name,
@@ -93,6 +93,7 @@ describe("ProviderRegistry", () => {
 			const provider = createMockProvider("TestSearch", Domain.Anime);
 			registry.register(provider);
 			const results = await registry.search(Domain.Anime, "test query");
+			// eslint-disable-next-line @typescript-eslint/unbound-method -- vi.fn() mock; this binding is not applicable
 			expect(provider.search).toHaveBeenCalledWith("test query");
 			expect(results).toHaveLength(1);
 			expect(results[0]?.title).toBe("Mock Result");
@@ -100,7 +101,7 @@ describe("ProviderRegistry", () => {
 
 		it("throws if no provider registered for domain", async () => {
 			const registry = new ProviderRegistry();
-			await expect(registry.search(Domain.Research, "test"))
+			await expect(() => registry.search(Domain.Research, "test"))
 				.rejects.toThrow('No provider registered for domain "research".');
 		});
 	});
@@ -111,13 +112,14 @@ describe("ProviderRegistry", () => {
 			const provider = createMockProvider("TestDetails", Domain.Games);
 			registry.register(provider);
 			const details = await registry.getDetails(Domain.Games, "game-123");
+			// eslint-disable-next-line @typescript-eslint/unbound-method -- vi.fn() mock; this binding is not applicable
 			expect(provider.getDetails).toHaveBeenCalledWith("game-123");
 			expect(details.title).toBe("Mock Detail");
 		});
 
 		it("throws if no provider registered for domain", async () => {
 			const registry = new ProviderRegistry();
-			await expect(registry.getDetails(Domain.Research, "id"))
+			await expect(() => registry.getDetails(Domain.Research, "id"))
 				.rejects.toThrow('No provider registered for domain "research".');
 		});
 	});

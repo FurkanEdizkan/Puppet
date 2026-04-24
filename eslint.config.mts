@@ -22,6 +22,14 @@ export default tseslint.config(
 		},
 	},
 	...obsidianmd.configs.recommended,
+	{
+		rules: {
+			"obsidianmd/ui/sentence-case": ["error", {
+				// Preserve proper nouns and acronyms not in the default lists
+				ignoreWords: ["Puppet", "TV", "Google", "Books", "Library"],
+			}],
+		},
+	},
 	globalIgnores([
 		"node_modules",
 		"dist",

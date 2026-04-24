@@ -47,7 +47,7 @@ export const DEFAULT_SETTINGS: PuppetSettings = {
 /** Domain labels for display. */
 const DOMAIN_LABELS: Record<Domain, string> = {
 	[Domain.Movies]: "Movies",
-	[Domain.Series]: "TV Series",
+	[Domain.Series]: "TV series",
 	[Domain.Anime]: "Anime",
 	[Domain.Manga]: "Manga",
 	[Domain.Manhwa]: "Manhwa",
@@ -65,7 +65,6 @@ export class PuppetSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	/* eslint-disable obsidianmd/ui/sentence-case */
 	display(): void {
 		const {containerEl} = this;
 		containerEl.empty();
@@ -177,5 +176,4 @@ export class PuppetSettingTab extends PluginSettingTab {
 			});
 		}
 	}
-	/* eslint-enable obsidianmd/ui/sentence-case */
 }

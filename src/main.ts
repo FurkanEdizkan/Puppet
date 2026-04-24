@@ -141,7 +141,6 @@ export default class Puppet extends Plugin {
 
 		this.addCommand({
 			id: "add-series",
-			// eslint-disable-next-line obsidianmd/ui/sentence-case
 			name: "Add TV series",
 			callback: () => this.openSearchFlow(Domain.Series),
 		});
@@ -313,7 +312,6 @@ export default class Puppet extends Plugin {
 		try {
 			const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
 			if (!frontmatter?.sourceId || !frontmatter?.source || !frontmatter?.type) {
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				new Notice("This note does not have Puppet metadata to refresh.");
 				return;
 			}
