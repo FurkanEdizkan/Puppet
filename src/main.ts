@@ -141,7 +141,7 @@ export default class Puppet extends Plugin {
 
 		this.addCommand({
 			id: "add-series",
-			name: "Add TV series",
+			name: "Add series",
 			callback: () => this.openSearchFlow(Domain.Series),
 		});
 
@@ -312,7 +312,7 @@ export default class Puppet extends Plugin {
 		try {
 			const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
 			if (!frontmatter?.sourceId || !frontmatter?.source || !frontmatter?.type) {
-				new Notice("This note does not have Puppet metadata to refresh.");
+				new Notice("This note does not have metadata to refresh.");
 				return;
 			}
 

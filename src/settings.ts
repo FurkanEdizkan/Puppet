@@ -73,7 +73,7 @@ export class PuppetSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Root folder")
-			.setDesc("Folder where Puppet stores all managed content.")
+			.setDesc("Folder where all managed content is stored.")
 			.addText(text => text
 				.setPlaceholder("Puppet")
 				.setValue(this.plugin.settings.rootFolder)
@@ -113,8 +113,8 @@ export class PuppetSettingTab extends PluginSettingTab {
 			.setName("Book provider")
 			.setDesc("Choose which API to use for book lookups.")
 			.addDropdown(dropdown => dropdown
-				.addOption("google", "Google Books")
-				.addOption("openlibrary", "Open Library")
+				.addOption("google", "Google books")
+				.addOption("openlibrary", "Open library")
 				.setValue(this.plugin.settings.bookProvider)
 				.onChange(async (value) => {
 					this.plugin.settings.bookProvider = value as "google" | "openlibrary";
@@ -123,7 +123,7 @@ export class PuppetSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Paper download format")
-			.setDesc("Preferred format for downloading research papers from arXiv.")
+			.setDesc("Preferred format for downloading research papers.")
 			.addDropdown(dropdown => dropdown
 				.addOption("pdf", "PDF")
 				.addOption("html", "HTML (experimental)")
